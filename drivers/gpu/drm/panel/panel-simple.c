@@ -2347,6 +2347,53 @@ static const struct panel_desc winstar_wf35ltiacd = {
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 };
 
+static const struct drm_display_mode nwd_70_800480ef_atxl_mode = {
+		/*
+		 * vfront_porch = vsync_start - vdisplay = 13
+		 * vback_porch = vtotal - vsync_end = 32
+		 * vsync_len = vsync_end - vsync_start = 3
+		 * hfront_porch = hsync_start - hdisplay = 40
+		 * hback_porch = htotal - hsync_end = 88
+		 * hsync_len = hsync_end - hsync_start = 48
+		 *
+		 * .clock = 9000,
+	.hdisplay = 480,
+	.hsync_start = 480 + 2,
+	.hsync_end = 480 + 2 + 41,
+	.htotal = 480 + 2 + 41 + 2,
+	.vdisplay = 272,
+	.vsync_start = 272 + 2,
+	.vsync_end = 272 + 2 + 11,
+	.vtotal = 272 + 2 + 11 + 2,
+	.vrefresh = 60,
+	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+		 *
+		 * */
+	.clock = 40000,
+	.hdisplay = 800,
+	.hsync_start = 800 + 40,
+	.hsync_end = 800 + 40 + 88,
+	.htotal = 800 + 40 + 88 + 48,
+	.vdisplay = 480,
+	.vsync_start = 480 + 13,
+	.vsync_end = 480 + 13 + 3,
+	.vtotal = 480 + 13 + 3 + 32,
+
+	.vrefresh = 60,
+	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+};
+
+static const struct panel_desc nwd_70_800480ef_atxl = {
+	.modes = &nwd_70_800480ef_atxl_mode,
+	.num_modes = 1,
+	.bpc = 8,
+	.size = {
+		.width = 800,
+		.height = 480,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+};
+
 static const struct of_device_id platform_of_match[] = {
 	{
 		.compatible = "ampire,am-480272h3tmqw-t01h",
@@ -2600,6 +2647,9 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "winstar,wf35ltiacd",
 		.data = &winstar_wf35ltiacd,
+	}, {	
+		.compatible = "newhaven,nhd-70-800480ef-atxl",
+		.data = &nwd_70_800480ef_atxl,
 	}, {
 		/* sentinel */
 	}
