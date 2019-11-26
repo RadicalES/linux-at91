@@ -34,18 +34,14 @@
 	ahb {
 		apb {
 			mmc0: mmc@f0000000 {				
-				status = "disabled";
-				
+				status = "disabled";				
 			};
 
 			mmc1: mmc@f8000000 {
-				
-				status = "disabled";
-				
+				status = "disabled";				
 			};
 
 			spi0: spi@f0004000 {
-				
 				status = "disabled";
 			};
 
@@ -66,7 +62,6 @@
 			};
 
 			i2c0: i2c@f0014000 {
-				
 				status = "disabled";
 			};
 
@@ -79,61 +74,38 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				status = "disabled";
-
-				ethernet-phy@7 {
-					reg = <0x7>;
-				};
 			};
 
 			pwm0: pwm@f002c000 {
-				pinctrl-names = "default";
-				pinctrl-0 = <&pinctrl_pwm0_pwmh0_0 &pinctrl_pwm0_pwmh1_0>;
 				status = "disabled";
 			};
 
 			usart0: serial@f001c000 {
-				status = "okay";
+				status = "disabled";
 			};
 
-			usart1: serial@f0020000 {
-				pinctrl-0 = <&pinctrl_usart1 &pinctrl_usart1_rts_cts>;
-				status = "okay";
+			usart1: serial@f0020000 {				
+				status = "disabled";
 			};
 
 			uart0: serial@f0024000 {
-				status = "okay";
+				status = "disabled";
 			};
 
-			mmc1: mmc@f8000000 {
-				
+			mmc1: mmc@f8000000 {				
 				status = "disabled";
 				
 			};
 
-			spi1: spi@f8008000 {
-				cs-gpios = <&pioC 25 0>;
+			spi1: spi@f8008000 {				
 				status = "disabled";
 			};
 
 			adc0: adc@f8018000 {
-				atmel,adc-vref = <3300>;
-				atmel,adc-channels-used = <0xfe>;
-				pinctrl-0 = <
-					&pinctrl_adc0_adtrg
-					&pinctrl_adc0_ad1
-					&pinctrl_adc0_ad2
-					&pinctrl_adc0_ad3
-					&pinctrl_adc0_ad4
-					&pinctrl_adc0_ad5
-					&pinctrl_adc0_ad6
-					&pinctrl_adc0_ad7
-					>;
 				status = "disabled";
 			};
 
-			i2c2: i2c@f801c000 {
-				dmas = <0>, <0>;	/* Do not use DMA for i2c2 */
-				
+			i2c2: i2c@f801c000 {			
 				status = "disabled";
 			};
 
@@ -141,9 +113,11 @@
 				phy-mode = "rmii";
 				#address-cells = <1>;
 				#size-cells = <0>;
-				status = "disabled";
+				status = "okay";
 
 				ethernet-phy@1 {
+					interrupt-parent = <&pioE>;
+                    interrupts = <30 IRQ_TYPE_EDGE_FALLING>;
 					reg = <0x1>;
 				};
 			};
