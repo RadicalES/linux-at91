@@ -33,32 +33,20 @@
 
 	ahb {
 		apb {
-			mmc0: mmc@f0000000 {
-				pinctrl-0 = <&pinctrl_mmc0_clk_cmd_dat0 &pinctrl_mmc0_dat1_3 &pinctrl_mmc0_dat4_7 &pinctrl_mmc0_cd>;
-				vmmc-supply = <&vcc_mmc0_reg>;
-				vqmmc-supply = <&vcc_3v3_reg>;
+			mmc0: mmc@f0000000 {				
 				status = "disabled";
-				slot@0 {
-					reg = <0>;
-					bus-width = <8>;
-					cd-gpios = <&pioE 0 GPIO_ACTIVE_LOW>;
-				};
+				
 			};
 
 			mmc1: mmc@f8000000 {
-				vmmc-supply = <&vcc_3v3_reg>;
-				vqmmc-supply = <&vcc_3v3_reg>;
+				
 				status = "disabled";
-				slot@0 {
-					reg = <0>;
-					bus-width = <4>;
-					cd-gpios = <&pioE 1 GPIO_ACTIVE_LOW>;
-				};
+				
 			};
 
 			spi0: spi@f0004000 {
-				cs-gpios = <&pioD 13 0>, <0>, <0>, <&pioD 16 0>;
-				status = "okay";
+				
+				status = "disabled";
 			};
 
 			can0: can@f000c000 {
@@ -78,7 +66,7 @@
 			};
 
 			i2c0: i2c@f0014000 {
-				pinctrl-0 = <&pinctrl_i2c0_pu>;
+				
 				status = "disabled";
 			};
 
@@ -117,13 +105,9 @@
 			};
 
 			mmc1: mmc@f8000000 {
-				pinctrl-0 = <&pinctrl_mmc1_clk_cmd_dat0 &pinctrl_mmc1_dat1_3 &pinctrl_mmc1_cd>;
+				
 				status = "disabled";
-				slot@0 {
-					reg = <0>;
-					bus-width = <4>;
-					cd-gpios = <&pioE 1 GPIO_ACTIVE_HIGH>;
-				};
+				
 			};
 
 			spi1: spi@f8008000 {
@@ -149,7 +133,7 @@
 
 			i2c2: i2c@f801c000 {
 				dmas = <0>, <0>;	/* Do not use DMA for i2c2 */
-				pinctrl-0 = <&pinctrl_i2c2_pu>;
+				
 				status = "disabled";
 			};
 
@@ -280,14 +264,6 @@
 		};
 	};
 
-	vcc_mmc0_reg: fixedregulator_mmc0 {
-		compatible = "regulator-fixed";
-		gpio = <&pioE 2 GPIO_ACTIVE_LOW>;
-		regulator-name = "mmc0-card-supply";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-always-on;
-	};
 
 	
 };
