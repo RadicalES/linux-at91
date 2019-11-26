@@ -1382,18 +1382,19 @@
 					clock-accuracy = <50000000>;
 					atmel,startup-time-usec = <75>;
 				};
-
+/*
 				slow_osc: slow_osc {
 					compatible = "atmel,at91sam9x5-clk-slow-osc";
 					#clock-cells = <0>;
 					clocks = <&slow_xtal>;
 					atmel,startup-time-usec = <1200000>;
 				};
-
+*/
 				clk32k: slowck {
 					compatible = "atmel,at91sam9x5-clk-slow";
 					#clock-cells = <0>;
-					clocks = <&slow_rc_osc &slow_osc>;
+					/*clocks = <&slow_rc_osc &slow_osc>;*/
+					clocks = <&slow_rc_osc>;
 				};
 			};
 
