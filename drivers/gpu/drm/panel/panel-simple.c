@@ -2348,31 +2348,19 @@ static const struct panel_desc winstar_wf35ltiacd = {
 };
 
 static const struct drm_display_mode nwd_70_800480ef_atxl_mode = {
-		/*
-		 * vfront_porch = vsync_start - vdisplay = 13
-		 * vback_porch = vtotal - vsync_end = 32
-		 * vsync_len = vsync_end - vsync_start = 3
-		 * hfront_porch = hsync_start - hdisplay = 40
-		 * hback_porch = htotal - hsync_end = 88
-		 * hsync_len = hsync_end - hsync_start = 48
-		 *
-		 * .clock = 9000,
-	.hdisplay = 480,
-	.hsync_start = 480 + 2,
-	.hsync_end = 480 + 2 + 41,
-	.htotal = 480 + 2 + 41 + 2,
-	.vdisplay = 272,
-	.vsync_start = 272 + 2,
-	.vsync_end = 272 + 2 + 11,
-	.vtotal = 272 + 2 + 11 + 2,
-	.vrefresh = 60,
-	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
-		 *
-		 * */
+	/*
+	 * vfront_porch = vsync_start - vdisplay = 13
+	 * vback_porch = vtotal - vsync_end = 32
+	 * vsync_len = vsync_end - vsync_start = 3
+	 * hfront_porch = hsync_start - hdisplay = 40
+	 * hback_porch = htotal - hsync_end = 88
+	 * hsync_len = hsync_end - hsync_start = 48
+	 * 
+	 * */
 	.clock = 40000,
 	.hdisplay = 800,
 	.hsync_start = 800 + 40,
-	.hsync_end = 800 + 40 + 88,
+	.hsync_end = 800 + 40 + 60,
 	.htotal = 800 + 40 + 88 + 48,
 	.vdisplay = 480,
 	.vsync_start = 480 + 13,
