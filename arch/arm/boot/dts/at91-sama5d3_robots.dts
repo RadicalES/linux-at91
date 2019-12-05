@@ -42,7 +42,13 @@
 			};
 
 			spi0: spi@f0004000 {
-				status = "disabled";
+				cs-gpios = <&pioD 13 0>, <0>, <0>, <0>;
+				status = "okay";
+				spidev@0 {
+					compatible = "linux,spidev";
+					spi-max-frequency = <1000000>;
+					reg = <0>;
+				};
 			};
 
 			can0: can@f000c000 {
@@ -81,11 +87,13 @@
 			};
 
 			usart0: serial@f001c000 {
-				status = "disabled";
+				pinctrl-0 = <&pinctrl_usart0 &pinctrl_usart0_rts_cts>;
+				status = "okay";
 			};
 
 			usart1: serial@f0020000 {				
-				status = "disabled";
+				pinctrl-0 = <&pinctrl_usart1 &pinctrl_usart1_rts_cts>;
+				status = "okay";
 			};
 
 			uart0: serial@f0024000 {
@@ -98,7 +106,45 @@
 			};
 
 			spi1: spi@f8008000 {				
-				status = "disabled";
+				pinctrl-0 = <&pinctrl_spi1 &pinctrl_spi1_cs0>;
+				status = "okay";
+
+				touch-spi@0 {
+					pinctrl-0 = <&pinctrl_touch>;
+					spi-max-frequency = <1000000>;
+					compatible = "ti,tsc2046";
+					reg = <0>;
+					ti,keep-vref-on = <1>;
+					interrupt-parent = <&pioC>;
+					interrupts = <31 0x0>;
+					pendown-gpio = <&pioC 31 0>;
+					
+
+					/* driver defaults */
+					ti,x-min = /bits/ 16 <230>;
+					ti,y-min = /bits/ 16 <230>;
+					ti,x-max = /bits/ 16 <3700>;
+					ti,y-max = /bits/ 16 <3900>;
+					ti,pressure-min = /bits/ 16 <0>;
+					ti,pressure-max = /bits/ 16 <1000>;
+					ti,x-plate-ohms = /bits/ 16 <400>;
+					ti,swap-xy = <1>;
+					ti,debounce-max = /bits/ 16 <30>;
+					ti,debounce-tol = /bits/ 16 <10>;
+					ti,debounce-rep = /bits/ 16 <1>;
+
+					/* other options 
+					ti,vref-delay-usecs
+					ti,vref-mv
+					
+					ti,settle-delay-usec
+					ti,penirq-recheck-delay-usecs
+					ti,y-plate-ohms
+					ti,pendown-gpio-debounce
+					linux,wakeup
+					*/
+
+				};
 			};
 
 			adc0: adc@f8018000 {
@@ -126,17 +172,52 @@
 				status = "okay";
 			};
 
+			hlcdc: hlcdc@f0030000 {
+				status = "okay";
+
+				hlcdc-display-controller {
+					pinctrl-names = "default";
+					pinctrl-0 = <&pinctrl_lcd_base &pinctrl_lcd_rgb888_alt>;
+
+					port@0 {
+						hlcdc_panel_output: endpoint@0 {
+							reg = <0>;
+							remote-endpoint = <&panel_input>;
+						};
+					};
+				};
+			};
+
 			pinctrl@fffff200 {
 				board {
 
 					pinctrl_usba_vbus: usba_vbus {
 						atmel,pins =
-							<AT91_PIOD 31 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>;	/* PE9, conflicts with A9 */
+							<AT91_PIOD 31 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>;
 					};
 
 					pinctrl_usbb_oc: usbb_oc {
 						atmel,pins =
 							<AT91_PIOE 17 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>;
+					};
+
+					pinctrl_usbc_oc: usbc_oc {
+						atmel,pins =
+							<AT91_PIOE 24 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>;
+					};
+				};
+
+				w1_0 {
+					pinctrl_w1_0: w1_0-0 {
+						atmel,pins = <AT91_PIOE 25 AT91_PERIPH_GPIO AT91_PINCTRL_PULL_UP>;
+					};
+				};
+
+				touch-ctrl {
+					pinctrl_touch: tci_0-0 {
+						atmel,pins = 
+							<AT91_PIOC 31 AT91_PERIPH_GPIO AT91_PINCTRL_PULL_UP_DEGLITCH /* pen down irq */
+							AT91_PIOC 28 AT91_PERIPH_GPIO AT91_PINCTRL_PULL_UP>; /* busy */
 					};
 				};
 
@@ -172,6 +253,10 @@
 		};
 
 		usb2: ehci@700000 {
+			num-ports = <1>;
+			atmel,oc-gpio = <&pioE 24 GPIO_ACTIVE_LOW>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usbc_oc &pinctrl_pwr_usb1>;
 			status = "okay";
 		};
 
@@ -236,6 +321,135 @@
 				};
 			};
 		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		run {
+			label = "rbt410:run";
+			gpios = <&pioE 20 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+			default-state = "off";
+		};
+
+		disk {
+			label = "rbt410:disk";
+			gpios = <&pioE 21 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "nand-disk";
+			default-state = "off";
+		};
+
+		usbpwr0 {
+			label = "rbt410:usbpwr0";
+			gpios = <&pioE 19 GPIO_ACTIVE_LOW>;
+			default-state = "off"; 
+			pinctrl-0 = <&pinctrl_pwr_usb0>;
+		};
+
+		usbpwr1 {
+			label = "rbt410:usbpwr1";
+			gpios = <&pioE 26 GPIO_ACTIVE_LOW>;
+			default-state = "off"; 
+			pinctrl-0 = <&pinctrl_pwr_usb1>;
+		};
+		
+		serialpwr {
+			label = "rbt410:serialpwr";
+			gpios = <&pioE 29 GPIO_ACTIVE_LOW>;
+			default-state = "off"; 
+			pinctrl-0 = <&pinctrl_pwr_serial>;
+		};
+
+
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;		
+		
+
+		up {
+			label = "UpArrow";
+			gpios = <&pioD 23 GPIO_ACTIVE_LOW>;
+			linux,code = <103>;
+			gpio-key,wakeup;
+		};
+
+		down {
+			label = "DownArrow";
+			gpios = <&pioD 22 GPIO_ACTIVE_LOW>;
+			linux,code = <108>;
+			gpio-key,wakeup;
+		};
+
+		escape {
+			label = "Escape";
+			gpios = <&pioD 21 GPIO_ACTIVE_LOW>;
+			linux,code = <1>;
+			gpio-key,wakeup;
+		};
+
+		enter {
+			label = "Enter";
+			gpios = <&pioD 20 GPIO_ACTIVE_LOW>;
+			linux,code = <28>;
+			gpio-key,wakeup;
+		};
+
+	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&hlcdc_pwm 0 50000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
+		power-supply = <&bl_reg>;
+		status = "okay";
+	};
+
+	bl_reg: backlight_regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "backlight-power-supply";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		status = "okay";
+	};
+
+	panel_reg: panel_regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "panel-power-supply";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		status = "okay";
+	};
+
+	panel: panel {
+		compatible = "newhaven,nhd-70-800480ef-atxl", "simple-panel";
+		backlight = <&backlight>;
+		power-supply = <&panel_reg>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "okay";
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			panel_input: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&hlcdc_panel_output>;
+			};
+		};
+	};
+
+	onewire@0 {
+		compatible = "w1-gpio";
+		gpios = <&pioE 25 GPIO_ACTIVE_LOW>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_w1_0>;
 	};
 
 
