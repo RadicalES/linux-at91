@@ -21,6 +21,10 @@
 		stdout-path = "serial0:115200n8";
 	};
 
+	aliases {
+		 ethernet0 = &macb1;
+	};
+
 	memory {
 		reg = <0x20000000 0x10000000>;
 	};
@@ -160,7 +164,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				status = "okay";
-
+				mac-address = [00 60 35 00 00 00];
 				ethernet-phy@1 {
 					interrupt-parent = <&pioE>;
                     interrupts = <30 IRQ_TYPE_EDGE_FALLING>;
@@ -196,21 +200,12 @@
 							<AT91_PIOD 31 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>;
 					};
 
-					pinctrl_usbb_oc: usbb_oc {
-						atmel,pins =
-							<AT91_PIOE 17 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>;
-					};
+					pinctrl_usbbc_oc: usbbc_oc {
+                        atmel,pins =
+                            <AT91_PIOE 17 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>,
+                            <AT91_PIOE 24 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>;
+                    };
 
-					pinctrl_usbc_oc: usbc_oc {
-						atmel,pins =
-							<AT91_PIOE 24 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>;
-					};
-				};
-
-				w1_0 {
-					pinctrl_w1_0: w1_0-0 {
-						atmel,pins = <AT91_PIOE 25 AT91_PERIPH_GPIO AT91_PINCTRL_PULL_UP>;
-					};
 				};
 
 				touch-ctrl {
@@ -222,19 +217,25 @@
 				};
 
 				pwr_ctrl {
-					pinctrl_pwr_usb0: pwr_0-0 {
-							atmel,pins = <AT91_PIOE 19 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
-					};
 
-					pinctrl_pwr_usb1: pwr_0-1 {
-							atmel,pins = <AT91_PIOE 26 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
-					};
+					pinctrl_pwr_usb_bc: pwr_0-0 {
+                    	atmel,pins = <AT91_PIOE 19 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>,
+                                       <AT91_PIOE 26 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
+                    };
+
 
 					pinctrl_pwr_serial: pwr_0-2 {
 							atmel,pins = <AT91_PIOE 29 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
 					};
 
 				};
+
+				spi1 {                
+                    pinctrl_spi1_cs0: spi1_cs0-0 {
+                        atmel,pins =
+                        <AT91_PIOC 25 AT91_PERIPH_A AT91_PINCTRL_NONE>;
+					};
+				};  
 			};
 		};
 
@@ -246,17 +247,21 @@
 		};
 
 		usb1: ohci@600000 {
-			num-ports = <1>;
-			atmel,vbus-gpio = <&pioE 17 GPIO_ACTIVE_LOW>;
-			pinctrl-0 = <&pinctrl_usbb_oc &pinctrl_pwr_usb0>;
-			status = "okay";
+			num-ports = <3>;
+                        atmel,vbus-gpio = <0
+                                        &pioE 19 GPIO_ACTIVE_LOW
+                                        &pioE 26 GPIO_ACTIVE_LOW
+                                        >;
+										
+/*                        atmel,oc-gpio = <0
+                                        &pioE 17 GPIO_ACTIVE_LOW
+                                        &pioE 24 GPIO_ACTIVE_LOW>;*/
+                        pinctrl-names = "default";
+                        pinctrl-0 = <&pinctrl_pwr_usb_bc &pinctrl_usbbc_oc>;
+                        status = "okay";
 		};
 
-		usb2: ehci@700000 {
-			num-ports = <1>;
-			atmel,oc-gpio = <&pioE 24 GPIO_ACTIVE_LOW>;
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_usbc_oc &pinctrl_pwr_usb1>;
+		usb2: ehci@700000 {			
 			status = "okay";
 		};
 
@@ -333,27 +338,6 @@
 			default-state = "off";
 		};
 
-		disk {
-			label = "rbt410:disk";
-			gpios = <&pioE 21 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "nand-disk";
-			default-state = "off";
-		};
-
-		usbpwr0 {
-			label = "rbt410:usbpwr0";
-			gpios = <&pioE 19 GPIO_ACTIVE_LOW>;
-			default-state = "off"; 
-			pinctrl-0 = <&pinctrl_pwr_usb0>;
-		};
-
-		usbpwr1 {
-			label = "rbt410:usbpwr1";
-			gpios = <&pioE 26 GPIO_ACTIVE_LOW>;
-			default-state = "off"; 
-			pinctrl-0 = <&pinctrl_pwr_usb1>;
-		};
-		
 		serialpwr {
 			label = "rbt410:serialpwr";
 			gpios = <&pioE 29 GPIO_ACTIVE_LOW>;
@@ -447,9 +431,7 @@
 
 	onewire@0 {
 		compatible = "w1-gpio";
-		gpios = <&pioE 25 GPIO_ACTIVE_LOW>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_w1_0>;
+		gpios = <&pioE 25 GPIO_ACTIVE_HIGH>;
 	};
 
 
