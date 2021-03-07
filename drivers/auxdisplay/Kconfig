@@ -16,6 +16,16 @@ menuconfig AUXDISPLAY
 
 if AUXDISPLAY
 
+config ST7565
+        tristate "ST7565 LCD Controller"
+        depends on SPI
+        default n
+        ---help---
+         If you have a LCD controller with a ST7565 chip connected to a SPI
+         port says Y. You will also need two additional lines to control RESET
+         and to select between data and control interface.
+
+
 config HD44780
 	tristate "HD44780 Character LCD support"
 	depends on GPIOLIB || COMPILE_TEST
